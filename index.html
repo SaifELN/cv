@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>موقع ويب بتقنية SPA</title>
     <link rel="stylesheet" href="styles.css">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
 </head>
 <body>
     <nav>
@@ -14,6 +13,56 @@
         <a href="/contact">اتصل بنا</a>
     </nav>
     <div id="app"></div>
-    <script type="module" src="app.js"></script>
+    <script type="module">
+        const app = document.getElementById('app');
+
+        // تحديد المسار الصحيح بناءً على URL المعاد توجيهه
+        function getPath() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('redirected') === 'true') {
+                const redirectPath = window.location.pathname;
+                window.history.replaceState({}, '', redirectPath);
+                return redirectPath;
+            }
+            return window.location.pathname;
+        }
+
+        async function navigate(path) {
+            let content;
+            switch (path) {
+                case '/':
+                    content = (await import('./home.js')).default;
+                    app.innerHTML = content;
+                    break;
+                case '/about':
+                    content = (await import('./about.js')).default;
+                    app.innerHTML = content;
+                    break;
+                case '/contact':
+                    content = (await import('./contact.js')).default;
+                    app.innerHTML = content;
+                    break;
+                default:
+                    app.innerHTML = '<h1>404</h1><p>الصفحة غير موجودة.</p>';
+                    break;
+            }
+        }
+
+        window.addEventListener('popstate', () => {
+            navigate(window.location.pathname);
+        });
+
+        document.body.addEventListener('click', event => {
+            if (event.target.tagName === 'A') {
+                event.preventDefault();
+                const path = event.target.getAttribute('href');
+                window.history.pushState({}, '', path);
+                navigate(path);
+            }
+        });
+
+        // معالجة المسارات عند تحميل الصفحة
+        navigate(getPath());
+    </script>
 </body>
 </html>
