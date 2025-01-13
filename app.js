@@ -1,43 +1,37 @@
 async function navigate(path) {
-  let content;
-  switch (path) {
-      case '/':
-          content = (await import('./home.js')).default;
-          app.innerHTML = content;
-          break;
-      case '/about':
-          content = (await import('./about.js')).default;
-          app.innerHTML = content;
-          break;
-      case '/contact':
-          content = (await import('./contact.js')).default;
-          app.innerHTML = content;
-          break;
-      default:
-          app.innerHTML = '<h1>404</h1><p>الصفحة غير موجودة.</p>';
-          break;
-  }
+    let content;
+    switch (path) {
+        case '/':
+            content = (await import('./home.js')).default;
+            app.innerHTML = content;
+            break;
+        case '/about':
+            content = (await import('./about.js')).default;
+            app.innerHTML = content;
+            break;
+        case '/contact':
+            content = (await import('./contact.js')).default;
+            app.innerHTML = content;
+            break;
+        default:
+            app.innerHTML = '<h1>404</h1><p>الصفحة غير موجودة.</p>';
+            break;
+    }
 }
 
 const app = document.getElementById('app');
 
 window.addEventListener('popstate', () => {
-  navigate(window.location.pathname);
+    navigate(window.location.pathname);
 });
 
 document.body.addEventListener('click', event => {
-  if (event.target.tagName === 'A') {
-      event.preventDefault();
-      const path = event.target.getAttribute('href');
-      window.history.pushState({}, '', path);
-      navigate(path);
-  }
+    if (event.target.tagName === 'A') {
+        event.preventDefault();
+        const path = event.target.getAttribute('href');
+        window.history.pushState({}, '', path);
+        navigate(path);
+    }
 });
 
-// معالجة المسارات غير الموجودة عند تحميل الصفحة مباشرة
-const initialPath = window.location.pathname;
-if (['/', '/about', '/contact'].includes(initialPath)) {
-  navigate(initialPath);
-} else {
-  navigate('/404'); // عرض صفحة الخطأ 404 داخل index.html
-}
+navigate(window.location.pathname);
