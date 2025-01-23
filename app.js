@@ -1,14 +1,14 @@
 // Define routes
 const routes = {
-  '/': 'pages/home.html',        // Default route
-  '/home': 'pages/home.html',
-  '/about': 'pages/about.html',
-  '/contact': 'pages/contact.html',
+  '#/': 'pages/home.html',        // Default route
+  '#/home': 'pages/home.html',
+  '#/about': 'pages/about.html',
+  '#/contact': 'pages/contact.html',
 };
 
 // Function to load content
-async function loadContent(path) {
-  const contentPath = routes[path] || 'pages/404.html'; // Fallback for unknown routes
+async function loadContent(route) {
+  const contentPath = routes[route] || 'pages/404.html'; // Fallback for unknown routes
   try {
     const response = await fetch(contentPath);
     if (!response.ok) throw new Error('Page not found');
@@ -23,14 +23,14 @@ async function loadContent(path) {
 function handleNavigation(event) {
   event.preventDefault(); // Prevent default link behavior
   const path = event.target.getAttribute('href'); // Get the href attribute
-  history.pushState({}, '', path); // Update the URL
+  window.location.hash = path; // Update the URL hash
   loadContent(path); // Load the content
 }
 
-// Event listener for popstate (back/forward navigation)
-window.addEventListener('popstate', () => {
-  const path = window.location.pathname;
-  loadContent(path);
+// Event listener for hash changes
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash;
+  loadContent(hash);
 });
 
 // Add event listeners to all navigation links
@@ -40,6 +40,6 @@ document.querySelectorAll('.nav-link').forEach(link => {
 
 // Initial load
 window.addEventListener('load', () => {
-  const path = window.location.pathname;
-  loadContent(path);
+  const hash = window.location.hash || '#/'; // Default to home
+  loadContent(hash);
 });
